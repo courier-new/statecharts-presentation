@@ -1,0 +1,11 @@
+{
+  "name": "statecharts-presentation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Kelli Rockwell <kellirockwell@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "mdx-deck": "^4.1.1",
+    "prettier": "^2.1.1"
+  }
+}
