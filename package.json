@@ -4,8 +4,12 @@
   "main": "index.js",
   "author": "Kelli Rockwell <kellirockwell@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "mdx-deck deck.mdx"
+  },
   "devDependencies": {
-    "mdx-deck": "^4.1.1",
-    "prettier": "^2.1.1"
+    "mdx-deck": "4.0.0",
+    "prettier": "^2.1.1",
+    "prism-react-renderer": "^1.1.1"
   }
 }
