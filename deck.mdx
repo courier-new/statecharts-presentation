@@ -1,6 +1,12 @@
 import { swiss } from '@mdx-deck/themes';
 import MainLayout from './layouts/MainLayout';
+import './layouts/slides.css';
 import CodeBlock from './components/CodeBlock';
+import Column from './components/Column';
+import Row from './components/Row';
+import TrafficLight from './components/TrafficLight';
+import TrafficLightWithControl from './components/TrafficLightWithControl';
+import VideoBlock from './components/VideoBlock';
 
 export const theme = swiss;
 
@@ -25,7 +31,13 @@ Kelli Rockwell
 <MainLayout>
 
 
-# Developers are really good at making the impossible, possible
+# We as Developers and Designers are really good at making the impossible, possible.
+
+<Notes>
+  - I wanted to start this off with a little celebration of what we do here when we build
+  things. We're bringing ideas to life, we're giving form to the formless. However you
+  want to put it, we're pretty good at making the impossible, possible!
+</Notes>
 
 </MainLayout>
 
@@ -35,7 +47,147 @@ Kelli Rockwell
 <MainLayout>
 
 
-# Sometimes, a little too good...
+# Sometimes, we're so good at it, we do it unintentionally!
+
+<Notes>
+  - Sometimes, we're so good at it, we actually do it unintentionally, too! And we've got
+  some really, really great user feedback commending us for these unintentional features,
+  so I wanted to share a couple of them with you all.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+import sutro from './images/sutro.png';
+
+<img src={sutro} />
+
+<Notes>
+  - So just as a bit of background in case you're unfamiliar or have forgotten, the
+  premise of Sutro is that you get this giant device that looks kinda like a water bottle
+  to float in your pool and take readings of various chemical properties of your water.
+  Interally it's powered by a replaceable cartridge, so when you first set up your Sutro
+  and whenever you need to replace the cartridge, we have to recalibrate it before we can
+  take readings again. We walk you through this process automatically in the app.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+import loadingSpinner from './videos/loading-spinner.mp4';
+
+<VideoBlock label={'*Dramatization, not actual user recording'} source={loadingSpinner} />
+
+<Notes>
+  - With that context, let me show you this amazing recording a user shared with us of one
+  the unintentional features we built around calibraton. So in this recording, the user
+  goes to open their app, and we tell them they need to recalibrate their Sutro Monitor.
+  Amazingly, it seems we are already working on the calibration for them, as no matter
+  what they do, they can't seem to interact with that "Complete Calibration" button! They
+  try force-closing and reopening, and nope, still can't interact! I think that motion is
+  because they're so excited! Uh, just ignore that bit at the end, I'm sure that was just
+  a glitch in the video or something.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+# ...
+
+<Notes>
+  - Uh, just ignore that bit at the end, I'm sure that was just a glitch in the video or
+  something.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+import inProgress from './videos/in-progress.mp4';
+
+<VideoBlock label={'*Dramatization, not actual user recording'} source={inProgress} />
+
+<Notes>
+  - Here's another great one! Now usually, going through calibration requires the user to
+  be present with their device in case something isn't quite right, like the lid isn't on
+  tight, for example. In this interaction, the user goes to start calibration, and we
+  helpfully tell them that calibration is already in progress! I guess no action required
+  on their part! What a seamless experience that definitely isn't how we initially
+  designed calibration to work!
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout verticalAlignment='top'>
+
+
+# What's the problem here?
+
+<Notes>
+  - So joking aside, what's going on, here? Well, it's usually because one of several
+  things happened.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout verticalAlignment='top'>
+
+
+# What's the problem here?
+
+- We changed the application logic and the UI got out of sync
+
+<Notes>
+  - Maybe the application logic chaged, and the UI just got out of sync. This is probably
+  how the loading spinner issue was introduced. The calibration process has evolved so
+  much over time, and whatever state condition we used to rely on to tell the app we're
+  "starting calibration" clearly isn't translating well to the UI anymore.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout verticalAlignment='top'>
+
+
+# What's the problem here?
+
+- We changed the application logic and the UI got out of sync
+- We tried to take a shortcut
+
+<Notes>
+  - This is probably what the defunct "Calibration in Progress" screen I showed you is
+  about. We needed an easy way to show one screen or another depending on some state when
+  calibration first starts, and the cheapest way to do so at the time was with this switch
+  statement. So then we added that default case, just in case.
+</Notes>
 
 </MainLayout>
 
@@ -45,21 +197,20 @@ Kelli Rockwell
 <MainLayout>
 
 
-# Let me show you an example
-
-</MainLayout>
-
-
----
-
-<MainLayout>
-
-
-Example with the dumb default case that shouldn't be possible
+Default case is supposedly impossible to reach:
 
 <CodeBlock>
-  {`const thing = 1;
-const a = () => {}`}
+  {`
+  switch(calibration.step) {
+    case "PRECHECK1":
+      return <PreCheck1 />;
+    case "PRECHECK2":
+      return <PreCheck2Confirmation />;
+    // This screen shouldn't be visible on other steps
+    default:
+      return <Text>{"Calibration in progress"}</Text>;
+  }
+  `}
 </CodeBlock>
 
 </MainLayout>
@@ -67,10 +218,202 @@ const a = () => {}`}
 
 ---
 
+<MainLayout verticalAlignment='top'>
+
+
+# What's the problem here?
+
+- We changed the application logic and the UI got out of sync
+- We tried to take a shortcut
+- We forgot to reset a condition
+- We missed an edge case
+- We didn't handle an API response properly
+- ...
+
+<Notes>
+  - But these aren't the only reasons, and I'm not here just to tell you what went wrong
+  for Sutro. These problems plague every project, all the time, and it's nobody's fault
+  that these bugs were reported. What I *am* here to tell you is that really, these
+  reasons are just consequences of a bigger problem.
+</Notes>
+
+</MainLayout>
+
+
+---
+
 <MainLayout>
 
 
-# Sometimes, a little too good...
+# We need a better model.
+
+<Notes>
+  - We've grown beyond a single "loading" boolean flag or a single switch statement with a
+  default case, and there's no better demonstration of this, than...
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+import hwFlowDiagram from './videos/hw-flow-diagram.mp4';
+
+<VideoBlock source={hwFlowDiagram} />
+
+<Notes>
+  - ...our HW flow diagram! I've tried to zoom out as far as I can to give you sense of
+  its scale, but it also carries over to the right and overflows into various other layers
+  and tabs that aren't visible. But, this is a representation of all the logic and
+  communication happening behind the scenes between our app, the server, and the Sutro
+  hardware itself that we have spent countless hours revising and maintaining over our
+  project's lifetime. Of *course* it's been a challenge to translate this into screens on
+  a phone!
+</Notes>
+
+</MainLayout>
+
+
+---
+
+import statechart1 from './images/reassuring-statechart.jpeg';
+import statechart2 from './images/reassuring-statechart-2.jpeg';
+import statechart3 from './images/reassuring-statechart-3.jpeg';
+
+<MainLayout>
+
+
+# Finite State Machines!
+
+<Row height="30vh">
+  <img src={statechart1} style={{ flex: 1, width: '100%' }} />
+  <img src={statechart2} style={{ flex: 1, width: '25vw', height: 'auto' }} />
+  <img src={statechart3} style={{ flex: 1, width: '25vw', height: 'auto' }} />
+</Row>
+
+<Notes>- So, I'm here to suggest that that model we need is finite state machines.</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+import wikipedia from './images/wikipedia.png';
+
+<img src={wikipedia} />
+
+<Notes>
+  - According to Wikipedia, a finite state machine, otherwise known as a finite-state
+  automaton, a finite automaton, or simply a state machine, is a mathematical model of
+  computation that...
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+# ...just kidding
+
+<Notes>
+  - According to Wikipedia, a finite state machine, otherwise known as a finite-state
+  automaton, a finite automaton, or simply a state machine, is a mathematical model of
+  computation that...
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+# We're already used to thinking in states.
+
+<Notes>
+  - What I want to show you today is that you already know how a finite state machine
+  works, and that's what makes it such a good choice for a modeling user interfaces. We're
+  actually already used to thinking in states.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+<TrafficLightWithControl />
+
+<Notes>
+  - A traffic light. What's going to happen when I click "next"? You all know the answer.
+  *Click* And now? *Click* Okay now's the tricky one, what comes next? *Click* And no
+  matter how many times I iterate through this, the results will always be the same.
+  Green, yellow, red.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+# First rule of Finite State Machines:
+
+### You can only be in one state at any given time.
+
+<Notes>
+  - This nicely illustrates the first rule of a finite state machine, which is that you
+  can only be in one state at any given time.
+</Notes>
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+<TrafficLightWithControl auto={true} />
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+<Row>
+  <TrafficLight currentColor="green" />
+  <TrafficLight currentColor="yellow" opacity={0.2} />
+  <TrafficLight currentColor="red" opacity={0.2} />
+</Row>
+
+# 1. Green - Initial State
+
+<Notes>
+  - A traffic light. What's going to happen when I click "next"? You all know the answer.
+  *Click* And now? *Click* Okay now's the tricky one, what comes next? *Click* And no
+  matter how many times I iterate through this, the results will always be the same.
+  Green, yellow, red. - If you're a PM, you could imagine writing tickets up for that. -
+  If you're a designer, you could imagine designing a screen view for that. - And if
+  you're a developer, you could imagine what coding this initial view might look like.
+</Notes>
 
 </MainLayout>
 

@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { FC } from 'react';
 
-export default ({ children }) => (
+const MainLayout: FC<{
+  verticalAlignment?: 'center' | 'top';
+  horizontalAlignment?: 'center' | 'left';
+}> = ({ children, verticalAlignment = 'center', horizontalAlignment = 'left' }) => (
   <div
     style={{
       background:
@@ -16,15 +19,20 @@ export default ({ children }) => (
   >
     <div
       style={{
-        justifyContent: 'space-around',
+        alignItems: horizontalAlignment === 'center' ? 'center' : 'flex-start',
+        justifyContent: verticalAlignment === 'center' ? 'space-around' : 'flex-start',
         background: 'white',
         display: 'flex',
         flex: 1,
         flexDirection: 'column',
         padding: '50px',
+        paddingTop: verticalAlignment === 'center' ? '50px' : '15vh',
+        width: '100%',
       }}
     >
       <div>{children}</div>
     </div>
   </div>
 );
+
+export default MainLayout;

@@ -1,0 +1,19 @@
+*:focus {
+  outline: none;
+}
+
+img {
+  max-height: 90vh;
+}
+
+button {
+  background-color: #17179f;
+  border: none;
+  color: #fff;
+  font-size: 0.8em;
+  padding: 0.3em 0.8em;
+}
+
+button:active {
+  background-color: #3c93ba;
+}
