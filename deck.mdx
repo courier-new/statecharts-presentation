@@ -388,7 +388,39 @@ import wikipedia from './images/wikipedia.png';
 <MainLayout horizontalAlignment='center'>
 
 
+<Notes>
+  - This makes sense, right? The light can't be green and red at the same time.
+</Notes>
+
 <TrafficLightWithControl auto={true} />
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+# Second rule of Finite State Machines:
+
+### You transition from one state to another based on an event.
+
+</MainLayout>
+
+
+---
+
+<MainLayout horizontalAlignment='center'>
+
+
+<Notes>
+  - In my contrived example, the event is me pressing the "next" button or the button to
+  cut or restore the signal, but in real life these events would probably be timers
+  running out, or a "signal lost" or "signal restored" event for the flashing red state
+</Notes>
+
+<TrafficLightWithControl />
 
 </MainLayout>
 
@@ -403,8 +435,6 @@ import wikipedia from './images/wikipedia.png';
   <TrafficLight currentColor="yellow" opacity={0.2} />
   <TrafficLight currentColor="red" opacity={0.2} />
 </Row>
-
-# 1. Green - Initial State
 
 <Notes>
   - A traffic light. What's going to happen when I click "next"? You all know the answer.
