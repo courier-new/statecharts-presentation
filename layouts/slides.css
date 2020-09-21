@@ -17,3 +17,65 @@ button {
 button:active {
   background-color: #3c93ba;
 }
+
+h1,
+h2,
+h3 {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
+}
+
+pre {
+  margin: 0;
+}
+
+hr {
+  border-bottom-color: #eee;
+  border-top-color: #eee;
+  border-left-color: #eee;
+  border-right-color: #eee;
+  border-bottom-style: none;
+  border-left-style: none;
+  border-right-style: none;
+  border-top-style: solid;
+  border-top-width: 2px;
+}
+
+.calibration-app button:not(:last-child) {
+  margin-right: 20px;
+}
+
+.context-form label {
+  display: flex;
+  font-size: 14px;
+  font-weight: 800;
+  min-width: 90px;
+  width: 20%;
+}
+
+.context-form input[type='checkbox'] {
+  margin: 0;
+}
+
+.context-form p {
+  margin: 0;
+}
+
+.context-form h4 {
+  font-size: 20px;
+  margin: 1.5em 0;
+}
+
+.context-form pre {
+  font-size: 16px;
+}
+
+.precheck1 .check {
+  display: flex;
+  flex-direction: column;
+  padding-right: 20px;
+}
+
+.precheck1 span {
+  font-size: 20px;
+}
