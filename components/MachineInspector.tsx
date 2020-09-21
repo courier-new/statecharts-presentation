@@ -22,11 +22,11 @@ const MachineInspector: FC<{
       devTools: true,
     });
 
-    // const inspector = inspect({ iframe: false, url: 'https://statecharts.io/inspect' });
+    const inspector = inspect({ iframe: false, url: 'https://statecharts.io/inspect' });
 
     service.start();
 
-    // return inspector.disconnect;
+    return inspector.disconnect;
   }, [id]);
 
   return null;
