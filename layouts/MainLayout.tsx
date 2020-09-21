@@ -11,7 +11,7 @@ const MainLayout: FC<{
       width: '100vw',
       height: '100vh',
       display: 'flex',
-      padding: '20px',
+      padding: '30px',
       position: 'absolute',
       top: 0,
       left: 0,
