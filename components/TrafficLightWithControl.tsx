@@ -1,33 +1,46 @@
 import React, { FC, useEffect, useState } from 'react';
-import TrafficLight from './TrafficLight';
+import { useMachine } from '@xstate/react';
+
+import TrafficLight, { StateColor } from './TrafficLight';
+import { expandedTrafficLightMachine, ExpandedState } from '../machines/traffic-light';
 
 const TrafficLightWithControl: FC<{ auto?: boolean }> = ({ auto }) => {
-  const [currentColor, setCurrentColor] = useState<'green' | 'yellow' | 'red' | 'hazard'>(
-    'green',
-  );
+  const [state, send] = useMachine(expandedTrafficLightMachine);
 
-  useEffect(() => {
-    if (auto) {
-      setTimeout(progress, 900);
-    }
-  }, [auto, currentColor]);
+  const [currentColor, setCurrentColor] = useState<StateColor>('green');
 
-  const progress = () => {
-    if (currentColor === 'green') {
-      setCurrentColor('yellow');
-    } else if (currentColor === 'yellow') {
-      setCurrentColor('red');
-    } else {
-      setCurrentColor('green');
+  const getColor = (state: ExpandedState): StateColor => {
+    switch (true) {
+      case state.matches({ connected: 'green' }):
+        return 'green';
+      case state.matches({ connected: 'yellow' }):
+        return 'yellow';
+      case state.matches({ connected: 'red' }):
+        return 'red';
+      case state.matches('disconnected'):
+        return 'hazard';
     }
   };
 
+  // When the state changes, set the color of the traffic light to match
+  useEffect(() => {
+    setCurrentColor(getColor(state));
+  }, [state, setCurrentColor]);
+
+  // If the mode is the auto-transition mode, issue a timer event every second
+  useEffect(() => {
+    if (auto) {
+      setTimeout(() => send('TIME_UP'), 1000);
+    }
+  }, [auto, state]);
+
+  // Sends a "SIGNAL_FOUND" or "SIGNAL_LOST" event depending on the current state
   const toggleSignal = () =>
-    currentColor === 'hazard' ? setCurrentColor('green') : setCurrentColor('hazard');
+    state.matches('disconnected') ? send('SIGNAL_FOUND') : send('SIGNAL_LOST');
 
   const buttons = auto ? null : (
     <div style={{ display: 'flex' }}>
-      <button onClick={progress}>Next</button>
+      <button onClick={() => send('TIME_UP')}>Next</button>
       <button
         style={{ backgroundColor: 'transparent', width: 100, marginRight: -100 }}
         onClick={toggleSignal}

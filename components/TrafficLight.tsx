@@ -8,8 +8,10 @@ const green = '#5EF471';
 const yellow = '#FDD253';
 const red = '#F8484E';
 
+export type StateColor = 'green' | 'yellow' | 'red' | 'hazard';
+
 const TrafficLight: FC<{
-  currentColor: 'green' | 'yellow' | 'red' | 'hazard';
+  currentColor: StateColor;
   opacity?: number;
 }> = ({ currentColor, opacity }) => {
   const [flashing, setFlashing] = useState<boolean>(false);
