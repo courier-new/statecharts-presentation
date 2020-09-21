@@ -2,12 +2,14 @@ import React, { FC } from 'react';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import nightOwl from 'prism-react-renderer/themes/nightOwl';
 
-const CodeBlock: FC<{ children: string; fontSize?: 'small' | 'medium' }> = ({
-  children,
-  fontSize,
-}) => {
+const CodeBlock: FC<{
+  children: string;
+  fontSize?: 'small' | 'medium';
+  height?: string | number;
+  width?: string | number;
+}> = ({ children, fontSize, height, width }) => {
   return (
-    <div style={{ width: 'calc(100vw - 160px)' }}>
+    <div style={{ height: height, width: width || 'calc(100vw - 160px)' }}>
       <Highlight {...defaultProps} code={children} language="typescript" theme={nightOwl}>
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre
@@ -15,7 +17,8 @@ const CodeBlock: FC<{ children: string; fontSize?: 'small' | 'medium' }> = ({
             style={{
               ...style,
               fontSize: fontSize === 'small' ? 15 : undefined,
-              padding: '0 2vw',
+              height: height,
+              padding: '0 1vw',
               width: '100%',
             }}
           >

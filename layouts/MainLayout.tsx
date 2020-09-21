@@ -20,7 +20,7 @@ const MainLayout: FC<{
     <div
       style={{
         alignItems: horizontalAlignment === 'center' ? 'center' : 'flex-start',
-        justifyContent: verticalAlignment === 'center' ? 'space-around' : 'flex-start',
+        justifyContent: verticalAlignment === 'center' ? 'center' : 'flex-start',
         background: 'white',
         display: 'flex',
         flex: 1,
@@ -30,7 +30,7 @@ const MainLayout: FC<{
         width: '100%',
       }}
     >
-      <div>{children}</div>
+      {children}
     </div>
   </div>
 );

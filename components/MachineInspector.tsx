@@ -12,16 +12,21 @@ const MACHINES = {
   expandedTrafficLight: expandedTrafficLightMachine,
 } as const;
 
-const MachineInspector: FC<{ id: keyof typeof MACHINES }> = ({ id }) => {
+const MachineInspector: FC<{
+  id?: keyof typeof MACHINES;
+  machine?: StateMachine<any, any, any>;
+}> = ({ id, machine }) => {
   useEffect(() => {
-    const machine: StateMachine<any, any, any> = MACHINES[id];
-    const service = interpret(machine, { devTools: true });
+    const machineFromProps: StateMachine<any, any, any> = machine || MACHINES[id];
+    const service = interpret(machineFromProps, {
+      devTools: true,
+    });
 
-    const inspector = inspect({ iframe: false, url: 'https://statecharts.io/inspect' });
+    // const inspector = inspect({ iframe: false, url: 'https://statecharts.io/inspect' });
 
     service.start();
 
-    return inspector.disconnect;
+    // return inspector.disconnect;
   }, [id]);
 
   return null;
