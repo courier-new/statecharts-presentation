@@ -11,5 +11,10 @@
     "mdx-deck": "4.0.0",
     "prettier": "^2.1.1",
     "prism-react-renderer": "^1.1.1"
+  },
+  "dependencies": {
+    "@xstate/inspect": "^0.1.1",
+    "@xstate/react": "^0.8.1",
+    "xstate": "^4.13.0"
   }
 }
