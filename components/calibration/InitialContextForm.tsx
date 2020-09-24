@@ -12,7 +12,7 @@ export const InitialContextForm: FC<{
 }> = ({ disabled, initialContext, setInitialContext }) => {
   return (
     <div className="context-form">
-      <h4>Initial Context (Extended State)</h4>
+      <h4>Initial Context from the "Server"</h4>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
         <label htmlFor="status">Status</label>
         <select

@@ -18,6 +18,11 @@ button:active {
   background-color: #3c93ba;
 }
 
+button:disabled {
+  background-color: #8080a7;
+  cursor: not-allowed;
+}
+
 h1,
 h2,
 h3 {

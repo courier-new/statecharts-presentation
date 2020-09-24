@@ -35,7 +35,7 @@ export const Precheck1Updater: FC<{
 
   useEffect(() => {
     if (!allStatusesSent()) {
-      const timeout = Math.round(Math.random() * 10) * 1000;
+      const timeout = Math.round(Math.random() * 8) * 1000;
       const randomStatus = getRandomUnsentStatus();
       const randomStatusResult = Math.random() * 100 > failChance;
       setTimeout(() => {

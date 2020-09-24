@@ -18,12 +18,27 @@ const getView = (
 ): JSX.Element[] => {
   switch (true) {
     case state.matches('dashboard'): {
-      return [
-        <h2 key="title">Dashboard</h2>,
-        <button key="button" onClick={() => send({ type: 'START_CALIBRATION' })}>
-          Start Calibration
-        </button>,
-      ];
+      const disabled = !state.context.needsCalibration;
+      const button =
+        state.context.status === 'IN_PROGRESS' ? (
+          <button
+            disabled={disabled}
+            key="resume"
+            onClick={() => send({ type: 'RESUME' })}
+          >
+            Resume
+          </button>
+        ) : (
+          <button
+            disabled={disabled}
+            key="button"
+            onClick={() => send({ type: 'START_CALIBRATION' })}
+          >
+            Start Calibration
+          </button>
+        );
+
+      return [<h2 key="title">Dashboard</h2>, button];
     }
     case state.matches('precheck1'): {
       return [
@@ -74,13 +89,15 @@ export const App2: FC<{}> = () => {
     step: 'DONE',
   });
 
+  const [formDisabled, setFormDisabled] = useState<boolean>(false);
+
   const machine = generateCalibrationMachine(initialContext);
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <InnerApp
-        machine={machine}
-        key={machine.id}
+      <InnerApp machine={machine} key={machine.id} setFormDisabled={setFormDisabled} />
+      <InitialContextForm
+        disabled={formDisabled}
         initialContext={initialContext}
         setInitialContext={setInitialContext}
       />
@@ -90,9 +107,8 @@ export const App2: FC<{}> = () => {
 
 const InnerApp: FC<{
   machine: CalibrationMachine;
-  initialContext: CalibrationContext;
-  setInitialContext: React.Dispatch<React.SetStateAction<CalibrationContext>>;
-}> = ({ machine, initialContext, setInitialContext }) => {
+  setFormDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ machine, setFormDisabled }) => {
   const [state, rawSend] = useMachine(machine);
 
   const send = (event: any) => {
@@ -102,25 +118,22 @@ const InnerApp: FC<{
 
   useEffect(() => console.log('STATE', state.value, state.context), [state]);
 
-  const formDisabled = !state.matches('dashboard');
+  useEffect(() => {
+    if (state.matches('dashboard')) {
+      setFormDisabled(false);
+    } else {
+      setFormDisabled(true);
+    }
+  }, [state, setFormDisabled]);
 
   return (
     <>
-      <MachineInspector machine={machine} />
-      <button key="resume" onClick={() => send({ type: 'RESUME' })}>
-        Resume
-      </button>
       {getView(state, send)}
       <button key="error" onClick={() => send({ type: 'ERROR' })}>
         Error
       </button>
       <p />
       <hr />
-      <InitialContextForm
-        disabled={formDisabled}
-        initialContext={initialContext}
-        setInitialContext={setInitialContext}
-      />
     </>
   );
 };

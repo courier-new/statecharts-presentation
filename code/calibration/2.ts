@@ -11,21 +11,6 @@ export type CalibrationContext = {
 };
 
 
-/** Builds a machine configuration for any of the steps that poll */
-const generateStepStates = (pollingActivity: string, retryDestination: string) => ({
-  initial: 'check',
-  states: {
-    check: {
-      activities: [pollingActivity],
-      on: { ERROR: 'error' },
-    },
-    error: {
-      on: { RETRY: retryDestination },
-    },
-  },
-});
-
-
 /** Builds a polling activity for a given polling function */
 const generatePollingActivity = (pollingFn: () => void) => () => {
   // Start the polling activity
@@ -72,17 +57,44 @@ export const generateCalibrationMachine = (initialContext: CalibrationContext) =
         },
         precheck1: {
           id: 'precheck1',
+          initial: 'check',
+          states: {
+            check: {
+              activities: ['pollingPrecheck1'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck1' },
+            },
+          },
           on: { PASS_PRECHECK1: 'precheck2' },
-          ...generateStepStates('pollingPrecheck1', '#precheck1'),
         },
         precheck2: {
           id: 'precheck2',
+          initial: 'check',
+          states: {
+            check: {
+              activities: ['pollingPrecheck2'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck2' },
+            },
+          },
           on: { PASS_PRECHECK2: 'prime' },
-          ...generateStepStates('pollingPrecheck2', '#precheck2'),
         },
         prime: {
+          initial: 'check',
+          states: {
+            check: {
+              activities: ['pollingPrime'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck2' },
+            },
+          },
           on: { PASS_PRIME: 'dashboard' },
-          ...generateStepStates('pollingPrime', '#precheck2'),
         },
       },
     },
@@ -114,12 +126,27 @@ const getView = (
 ): JSX.Element[] => {
   switch (true) {
     case state.matches('dashboard'): {
-      return [
-        <h2>Dashboard</h2>,
-        <button onClick={() => send({ type: 'START_CALIBRATION' })}>
-          Start Calibration
-        </button>,
-      ];
+      const disabled = !state.context.needsCalibration;
+      const button =
+        state.context.status === 'IN_PROGRESS' ? (
+          <button
+            disabled={disabled}
+            key="resume"
+            onClick={() => send({ type: 'RESUME' })}
+          >
+            Resume
+          </button>
+        ) : (
+          <button
+            disabled={disabled}
+            key="button"
+            onClick={() => send({ type: 'START_CALIBRATION' })}
+          >
+            Start Calibration
+          </button>
+        );
+
+      return [<h2 key="title">Dashboard</h2>, button];
     }
     case state.matches('precheck1'): {
       return [
@@ -170,42 +197,40 @@ export const App2: FC<{}> = () => {
     step: 'DONE',
   });
 
+  const [formDisabled, setFormDisabled] = useState<boolean>(false);
+
   const machine = generateCalibrationMachine(initialContext);
 
   return (
-    <InnerApp
-      machine={machine}
-      key={machine.id}
-      initialContext={initialContext}
-      setInitialContext={setInitialContext}
-    />
-  );
-};
-
-const InnerApp: FC<{
-  machine: CalibrationMachine;
-  initialContext: CalibrationContext;
-  setInitialContext: React.Dispatch<React.SetStateAction<CalibrationContext>>;
-}> = ({ machine, initialContext, setInitialContext }) => {
-  const [state, send] = useMachine(machine);
-
-  const formDisabled = !state.matches('dashboard');
-
-  return (
     <>
-      <button onClick={() => send({ type: 'RESUME' })}>
-        Resume
-      </button>
-      {getView(state, send)}
-      <button onClick={() => send({ type: 'ERROR' })}>
-        Error
-      </button>
-      <hr />
+      <InnerApp machine={machine} key={machine.id} setFormDisabled={setFormDisabled} />
       <InitialContextForm
         disabled={formDisabled}
         initialContext={initialContext}
         setInitialContext={setInitialContext}
       />
+    </>
+  );
+};
+
+const InnerApp: FC<{
+  machine: CalibrationMachine;
+  setFormDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ machine, setFormDisabled }) => {
+  const [state, send] = useMachine(machine);
+
+  useEffect(() => {
+    if (!state.matches('dashboard')) {
+      setFormDisabled(true);
+    }
+  }, [state, setFormDisabled]);
+
+  return (
+    <>
+      {getView(state, send)}
+      <button onClick={() => send({ type: 'ERROR' })}>
+        Error
+      </button>
     </>
   );
 };

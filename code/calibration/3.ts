@@ -44,37 +44,6 @@ const updatePrecheck1 = assign({
 });
 
 
-/** Action to reset the status of a Precheck1 checks in context */
-const resetPrecheck1 = assign({
-  precheck1: (context: CalibrationContext, event: UpdatePrecheck1Event) =>
-    INITIAL_PRECHECK1_CONTEXT,
-});
-
-
-/** Builds a machine configuration for any of the steps that poll */
-const generateStepStates = (
-  pollingActivity: string,
-  retryDestination: string,
-  retryAction?: AssignAction<CalibrationContext, CalibrationEvent>,
-) => ({
-  initial: 'check' as const,
-  states: {
-    check: {
-      activities: [pollingActivity],
-      on: { ERROR: 'error' } as const,
-    },
-    error: {
-      on: {
-        RETRY: {
-          target: retryDestination,
-          actions: retryAction,
-        },
-      } as const,
-    },
-  },
-});
-
-
 /** Builds a polling activity for a given polling function */
 const generatePollingActivity = (pollingFn: () => void) => () => {
   // Start the polling activity
@@ -121,6 +90,15 @@ export const generateCalibrationMachine = (initialContext: CalibrationContext) =
         },
         precheck1: {
           id: 'precheck1',
+          states: {
+            check: {
+              activities: ['pollingPrecheck1'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck1' },
+            },
+          },
           on: {
             UPDATE_PRECHECK1: {
               target: 'precheck1',
@@ -128,26 +106,38 @@ export const generateCalibrationMachine = (initialContext: CalibrationContext) =
             },
             PASS_PRECHECK1: 'precheck2',
           },
-          ...generateStepStates('pollingPrecheck1', '#precheck1', resetPrecheck1),
         },
         precheck2: {
           id: 'precheck2',
-          on: { PASS_PRECHECK2: 'prime' },
-          ...generateStepStates('pollingPrecheck2', '#precheck2'),
-        },
-        prime: {
-          on: {
-            PASS_PRIME: {
-              target: 'dashboard',
-              actions: resetPrecheck1,
+          initial: 'check',
+          states: {
+            check: {
+              activities: ['pollingPrecheck2'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck2' },
             },
           },
-          ...generateStepStates('pollingPrime', '#precheck2'),
+          on: { PASS_PRECHECK2: 'prime' },
+        },
+        prime: {
+          initial: 'check',
+          states: {
+            check: {
+              activities: ['pollingPrime'],
+              on: { ERROR: 'error' },
+            },
+            error: {
+              on: { RETRY: '#precheck2' },
+            },
+          },
+          on: { PASS_PRIME: 'dashboard' },
         },
       },
     },
     {
-      actions: { resetPrecheck1, updatePrecheck1 },
+      actions: { updatePrecheck1 },
       activities: {
         pollingPrecheck1: generatePollingActivity(() =>
           console.log('polling for precheck1'),
@@ -302,7 +292,7 @@ const InnerApp: FC<{ machine: CalibrationMachine }> = ({ machine }) => {
   const [state, send] = useMachine(machine);
   const [failChance, setFailChance] = useState<string>('50');
 
-  const formDisabled = !state.matches('dashboard');
+  const formDisabled = state.matches({ precheck1: 'check' });
 
   return (
     <>

@@ -1,19 +1,4 @@
 export const machineCode1 = `
-/** Builds a machine configuration for any of the steps that poll */
-const generateStepStates = (pollingActivity: string, retryDestination: string) => ({
-  initial: 'check',
-  states: {
-    check: {
-      activities: [pollingActivity],
-      on: { ERROR: 'error' },
-    },
-    error: {
-      on: { RETRY: retryDestination },
-    },
-  },
-});
-
-
 /** Builds a polling activity for a given polling function */
 const generatePollingActivity = (pollingFn: () => void) => () => {
   // Start the polling activity
@@ -38,17 +23,44 @@ export const calibrationMachine = Machine(
       },
       precheck1: {
         id: 'precheck1',
+        initial: 'check',
+        states: {
+          check: {
+            activities: ['pollingPrecheck1'],
+            on: { ERROR: 'error' },
+          },
+          error: {
+            on: { RETRY: '#precheck1' },
+          },
+        },
         on: { PASS_PRECHECK1: 'precheck2' },
-        ...generateStepStates('pollingPrecheck1', '#precheck1'),
       },
       precheck2: {
         id: 'precheck2',
+        initial: 'check',
+        states: {
+          check: {
+            activities: ['pollingPrecheck2'],
+            on: { ERROR: 'error' },
+          },
+          error: {
+            on: { RETRY: '#precheck2' },
+          },
+        },
         on: { PASS_PRECHECK2: 'prime' },
-        ...generateStepStates('pollingPrecheck2', '#precheck2'),
       },
       prime: {
+        initial: 'check',
+        states: {
+          check: {
+            activities: ['pollingPrime'],
+            on: { ERROR: 'error' },
+          },
+          error: {
+            on: { RETRY: '#precheck2' },
+          },
+        },
         on: { PASS_PRIME: 'dashboard' },
-        ...generateStepStates('pollingPrime', '#precheck2'),
       },
     },
   },

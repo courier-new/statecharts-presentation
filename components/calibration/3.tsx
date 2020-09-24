@@ -168,7 +168,7 @@ const InnerApp: FC<{ machine: CalibrationMachine }> = ({ machine }) => {
 
   useEffect(() => console.log('STATE', state.value, state.context), [state]);
 
-  const formDisabled = !state.matches('dashboard');
+  const formDisabled = state.matches({ precheck1: 'check' });
 
   const parsedFailChance = isNumber(parseInt(failChance)) ? parseInt(failChance) : 50;
 
