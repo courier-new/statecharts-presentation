@@ -27,9 +27,7 @@ export const theme = swiss;
 <MainLayout>
 
 
-# State of the Art / The Art of State
-
-### Modeling UI with Statecharts
+# Modeling UI with Statecharts
 
 Kelli Rockwell
 
@@ -43,12 +41,6 @@ Kelli Rockwell
 
 # We as developers and designers are really good at making the impossible, possible.
 
-<Notes>
-  - I wanted to start this off with a little celebration of what we do here when we build
-  things. We're bringing ideas to life, we're giving form to the formless. However you
-  want to put it, we're pretty good at making the impossible, possible!
-</Notes>
-
 </MainLayout>
 
 
@@ -58,12 +50,6 @@ Kelli Rockwell
 
 
 # Sometimes, we're so good at it, we do it unintentionally!
-
-<Notes>
-  - Sometimes, we're so good at it, we actually do it unintentionally, too! And we've got
-  some really, really great user feedback commending us for these unintentional features,
-  so I wanted to share a couple of them with you all.
-</Notes>
 
 </MainLayout>
 
@@ -77,15 +63,6 @@ import sutro from './images/sutro.png';
 
 <img src={sutro} />
 
-<Notes>
-  - So just as a bit of background in case you're unfamiliar or have forgotten, the
-  premise of Sutro is that you get this giant device that looks kinda like a water bottle
-  to float in your pool and take readings of various chemical properties of your water.
-  Interally it's powered by a replaceable cartridge, so when you first set up your Sutro
-  and whenever you need to replace the cartridge, we have to recalibrate it before we can
-  take readings again. We walk you through this process automatically in the app.
-</Notes>
-
 </MainLayout>
 
 
@@ -98,17 +75,6 @@ import loadingSpinner from './videos/loading-spinner.mp4';
 
 <VideoBlock label={'*Dramatization, not actual user recording'} source={loadingSpinner} />
 
-<Notes>
-  - With that context, let me show you this amazing recording a user shared with us of one
-  the unintentional features we built around calibraton. So in this recording, the user
-  goes to open their app, and we tell them they need to recalibrate their Sutro Monitor.
-  Amazingly, it seems we are already working on the calibration for them, as no matter
-  what they do, they can't seem to interact with that "Complete Calibration" button! They
-  try force-closing and reopening, and nope, still can't interact! I think that motion is
-  because they're so excited! Uh, just ignore that bit at the end, I'm sure that was just
-  a glitch in the video or something.
-</Notes>
-
 </MainLayout>
 
 
@@ -118,11 +84,6 @@ import loadingSpinner from './videos/loading-spinner.mp4';
 
 
 # ...
-
-<Notes>
-  - Uh, just ignore that bit at the end, I'm sure that was just a glitch in the video or
-  something.
-</Notes>
 
 </MainLayout>
 
@@ -136,14 +97,15 @@ import inProgress from './videos/in-progress.mp4';
 
 <VideoBlock label={'*Dramatization, not actual user recording'} source={inProgress} />
 
-<Notes>
-  - Here's another great one! Now usually, going through calibration requires the user to
-  be present with their device in case something isn't quite right, like the lid isn't on
-  tight, for example. In this interaction, the user goes to start calibration, and we
-  helpfully tell them that calibration is already in progress! I guess no action required
-  on their part! What a seamless experience that definitely isn't how we initially
-  designed calibration to work!
-</Notes>
+</MainLayout>
+
+
+---
+
+<MainLayout>
+
+
+# These are both "impossible states." So how did the user end up here?
 
 </MainLayout>
 
@@ -153,32 +115,10 @@ import inProgress from './videos/in-progress.mp4';
 <MainLayout verticalAlignment='top'>
 
 
-# What's the problem here?
-
-<Notes>
-  - So joking aside, what's going on, here? Well, it's usually because one of several
-  things happened.
-</Notes>
-
-</MainLayout>
-
-
----
-
-<MainLayout verticalAlignment='top'>
-
-
-# What's the problem here?
+# How did the user end up here?
 
 - We changed the application logic and the UI got out of sync
 
-<Notes>
-  - Maybe the application logic chaged, and the UI just got out of sync. This is probably
-  how the loading spinner issue was introduced. The calibration process has evolved so
-  much over time, and whatever state condition we used to rely on to tell the app we're
-  "starting calibration" clearly isn't translating well to the UI anymore.
-</Notes>
-
 </MainLayout>
 
 
@@ -187,17 +127,10 @@ import inProgress from './videos/in-progress.mp4';
 <MainLayout verticalAlignment='top'>
 
 
-# What's the problem here?
+# How did the user end up here?
 
 - We changed the application logic and the UI got out of sync
 - We tried to take a shortcut
-
-<Notes>
-  - This is probably what the defunct "Calibration in Progress" screen I showed you is
-  about. We needed an easy way to show one screen or another depending on some state when
-  calibration first starts, and the cheapest way to do so at the time was with this switch
-  statement. So then we added that default case, just in case.
-</Notes>
 
 </MainLayout>
 
@@ -219,7 +152,7 @@ Default case is supposedly impossible to reach:
 <MainLayout verticalAlignment='top'>
 
 
-# What's the problem here?
+# How did the user end up here?
 
 - We changed the application logic and the UI got out of sync
 - We tried to take a shortcut
@@ -227,13 +160,6 @@ Default case is supposedly impossible to reach:
 - We missed an edge case
 - We didn't handle an API response properly
 - ...
-
-<Notes>
-  - But these aren't the only reasons, and I'm not here just to tell you what went wrong
-  for Sutro. These problems plague every project, all the time, and it's nobody's fault
-  that these bugs were reported. What I *am* here to tell you is that really, these
-  reasons are just consequences of a bigger problem.
-</Notes>
 
 </MainLayout>
 
@@ -243,12 +169,7 @@ Default case is supposedly impossible to reach:
 <MainLayout>
 
 
-# We need a better model.
-
-<Notes>
-  - We've grown beyond a single "loading" boolean flag or a single switch statement with a
-  default case, and there's no better demonstration of this, than...
-</Notes>
+# We need a better model for our state.
 
 </MainLayout>
 
@@ -261,16 +182,6 @@ Default case is supposedly impossible to reach:
 import hwFlowDiagram from './videos/hw-flow-diagram.mp4';
 
 <VideoBlock source={hwFlowDiagram} />
-
-<Notes>
-  - ...our HW flow diagram! I've tried to zoom out as far as I can to give you sense of
-  its scale, but it also carries over to the right and overflows into various other layers
-  and tabs that aren't visible. But, this is a representation of all the logic and
-  communication happening behind the scenes between our app, the server, and the Sutro
-  hardware itself that we have spent countless hours revising and maintaining over our
-  project's lifetime. Of *course* it's been a challenge to translate this into screens on
-  a phone!
-</Notes>
 
 </MainLayout>
 
@@ -292,8 +203,6 @@ import statechart3 from './images/reassuring-statechart-3.jpeg';
   <img src={statechart3} style={{ flex: 1, width: '25vw', height: 'auto' }} />
 </Row>
 
-<Notes>- So, I'm here to suggest that that model we need is finite state machines.</Notes>
-
 </MainLayout>
 
 
@@ -306,12 +215,6 @@ import wikipedia from './images/wikipedia.png';
 
 <img src={wikipedia} />
 
-<Notes>
-  - According to Wikipedia, a finite state machine, otherwise known as a finite-state
-  automaton, a finite automaton, or simply a state machine, is a mathematical model of
-  computation that...
-</Notes>
-
 </MainLayout>
 
 
@@ -321,12 +224,6 @@ import wikipedia from './images/wikipedia.png';
 
 
 # ...just kidding
-
-<Notes>
-  - According to Wikipedia, a finite state machine, otherwise known as a finite-state
-  automaton, a finite automaton, or simply a state machine, is a mathematical model of
-  computation that...
-</Notes>
 
 </MainLayout>
 
@@ -338,12 +235,6 @@ import wikipedia from './images/wikipedia.png';
 
 # We're already used to thinking in state machines.
 
-<Notes>
-  - What I want to show you today is that you already know how a finite state machine
-  works, and that's what makes it such a good choice for a modeling user interfaces. We're
-  actually already used to thinking in state machines.
-</Notes>
-
 </MainLayout>
 
 
@@ -353,16 +244,6 @@ import wikipedia from './images/wikipedia.png';
 
 
 <TrafficLightWithControl />
-
-<Notes>
-  - A traffic light. What's going to happen when I click "next"? You all know the answer.
-  *Click* And now? *Click* Okay now's the tricky one, what comes next? *Click secret
-  button* HA gotcha, this traffic light got out of sync with the others and is now
-  blinking red! Okay but usually you know what happens. *Click back through to red* And no
-  matter how many times I iterate through this, the order will always be the same. Green,
-  yellow, red. - This traffic light can be modeled as a finite state machine. Let me
-  explain a bit more about what that means.
-</Notes>
 
 </MainLayout>
 
@@ -376,11 +257,6 @@ import wikipedia from './images/wikipedia.png';
 
 ### You can only be in one state at any given time.
 
-<Notes>
-  - The first rule of finite state machines is that you can only be in one state at any
-  given time.
-</Notes>
-
 </MainLayout>
 
 
@@ -388,10 +264,6 @@ import wikipedia from './images/wikipedia.png';
 
 <MainLayout horizontalAlignment='center'>
 
-
-<Notes>
-  - This makes sense, right? The light can't be both green and red at the same time.
-</Notes>
 
 <TrafficLightWithControl auto={true} />
 
@@ -405,15 +277,10 @@ import wikipedia from './images/wikipedia.png';
 
 # Second rule of Finite State Machines:
 
-### You have a finite (as opposed to infinite) number of states.
+### You have a finite number of discrete states.
 
 </MainLayout>
 
-
-<Notes>
-  - The second rule of finite state machines is that you have to have a finite number of
-  states.
-</Notes>
 
 ---
 
@@ -425,12 +292,6 @@ import wikipedia from './images/wikipedia.png';
     <TrafficLight currentColor="hazard" />
   </Row>
 </MainLayout>
-
-<Notes>
-  - You can also see this really obviously with the traffic light example. Here we have 4
-  well-defined states: green, yellow, red, and the hazard flashing red state, whatever you
-  want to call that.
-</Notes>
 
 ---
 
@@ -448,14 +309,6 @@ import wikipedia from './images/wikipedia.png';
 
 <MainLayout horizontalAlignment='center'>
 
-
-<Notes>
-  - In my contrived slideshow example, the event happens to be me pressing the "next"
-  button or the secret invisible button to cut or restore the signal, but in real life
-  these events would probably be timers running out, or a "signal lost" or "signal found"
-  event for the flashing red state - So knowing these two rules, maybe you can start to
-  imagine how this would mainfest in building a user interface.
-</Notes>
 
 <TrafficLightWithControl />
 
@@ -475,12 +328,6 @@ import wikipedia from './images/wikipedia.png';
 
 # Then, the light turns green.
 
-<Notes>
-  - For example, you might see how this translates to acceptance conditions. - As a
-  driver, given the light is red (there's your current state), when 30 seconds has elapsed
-  (there's the transition event), then, the light turns green (there's the next state).
-</Notes>
-
 </MainLayout>
 
 
@@ -493,36 +340,30 @@ import prototypes from './images/prototypes.png';
 
 <img src={prototypes} />
 
-<Notes>
-  - In design, this translates to interactive prototypes where you have your finite number
-  of screens and enumerate all of the possible transitions between them - In code, there's
-  a library for building finite state machines in basically every language, but for super
-  simple examples, a switch statement can usually also get the job done.
-</Notes>
-
-  </MainLayout>
+</MainLayout>
 
 
 ---
 
-  <MainLayout>
+<MainLayout>
+
+
+<CodeBlock fontSize="medium">{simpleStateMachine}</CodeBlock>
+
+</MainLayout>
+
+
+---
+
+<MainLayout>
 
 
 The problem here isn't the switch statement, it's that **the state machine is implicit**
 
 <CodeBlock>{calibrationSwitch}</CodeBlock>
 
-  </MainLayout>
+</MainLayout>
 
-
-<Notes>
-  - To briefly revisit the switch statement I showed you earlier that caused the
-  "Calibration in progress" bug, I want to be clear that it's not the switch statement
-  itself that's bad here. It's the fact that it relies on an underlying state machine that
-  is implicit. It's implementation is scattered around the code base, the transitions
-  really only exist in the developers’ heads, and the states are not well-defined. This is
-  what makes these bugs common and challenging to track down in any app.
-</Notes>
 
 ---
 
@@ -532,12 +373,6 @@ The problem here isn't the switch statement, it's that **the state machine is im
 import xstate from './images/xstate.png';
 
 <img src={xstate} />
-
-<Notes>
-  - Since Sutro's app is built in javascript, I'm going to show you code examples today in
-  javascript using a library called xstate. I like using it because it has pretty solid
-  typescript support and its own visualizer tool...
-</Notes>
 
 </MainLayout>
 
@@ -551,23 +386,6 @@ import xstate from './images/xstate.png';
 
 <CodeBlock>{trafficLightMachineCode}</CodeBlock>
 
-<Notes>
-  - ...which looks like this! Here I'm inspecting a state machine I built for the super
-  basic traffic light with only three states. The current state is shown in blue, and I
-  can send events to simulate the timer counting down to trigger transitions to other
-  states - Here's what the machine looks like. You just plug this configuration object
-  into a `Machine` function, and then you run it wherever you want. I've specified for
-  this example that the initial state is 'green', and then I've defined my three states
-  'green', 'yellow', and 'red'. Each state has a transition defined for the event
-  'TIME_UP', which specifies which state it should move to, such as 'yellow' from 'green'.
-  - Now, to add that fourth red blinking state, I could just add a "DISCONNECTED" event
-  transition for all three states that takes you to the blinking state, but if we in the
-  future we added 'orange' as a state of our traffic light between yellow and red, we'd
-  have to remember to add that "DISCONNECTED" event transition to the new state, too, and
-  I don't want to have to remember to do that, so I think I'm going to represent it a bit
-  differently:
-</Notes>
-
 </MainLayout>
 
 
@@ -580,21 +398,6 @@ import xstate from './images/xstate.png';
 
 <CodeBlock>{expandedTrafficLightMachineCode}</CodeBlock>
 
-<Notes>
-  - So what I've done here is actually nested state. You can see our original traffic
-  light state machine is unaltered in here, and I'm calling this the "connected" state.
-  But now, if the traffic light loses the signal and desyncs from the other lights at the
-  intersection, it transitions to the "disconnected" state, where we'd show it flashing
-  red. And once it regains the signal, it transitions back to the "connected" state and
-  restarts on "green". - In the code, this looks exactly like you might expect, with our
-  original traffic light states nested under the "connected" state. You can also see the
-  addition of the `SIGNAL_FOUND` and `SIGNAL_LOST` events here. I've made the initial
-  state "connected" now to keep parity with the example I showed you, but I imagine in
-  real life when a traffic light first powers on, it might actually take a moment to sync
-  up to the other lights at the intersection and thus should probably start in the
-  "disconnected" state. But we're not going for realism here.
-</Notes>
-
 </MainLayout>
 
 
@@ -604,12 +407,6 @@ import xstate from './images/xstate.png';
 
 
 # Statechart = finite state machine with nested and/or parallel states
-
-<Notes>
-  - This machine is actually what's refered to as a statechart - it's a state machine that
-  can have hierarchies of nested states as well as parallel states. This feature makes
-  statecharts really effective at preventing what's known as "state explosion"...
-</Notes>
 
 </MainLayout>
 
@@ -623,14 +420,6 @@ import stateExplosion from './images/state-explosion.svg';
 
 <img src={stateExplosion} />
 
-<Notes>
-  - ...which happens as the total number of states and transitions you have grows. Here
-  I'm showing an example state machine for a single form input field in which we show a
-  different state depending on if the input is changed vs. unchanged, valid vs. invalid,
-  or enabled vs. disabled. Represented as a regular finite state machine, it gets pretty
-  hairy. But...
-</Notes>
-
 </MainLayout>
 
 
@@ -643,15 +432,6 @@ import stateExplosionFixed from './images/state-explosion-fixed.svg';
 
 <img src={stateExplosionFixed} />
 
-<Notes>
-  - ...as a statechart, we can repesent enabled vs. disabled as parallel states because
-  all four combinations of them are real states and they can each change independendently
-  of the other one. We also decide that for this form input, we only consider an input
-  valid or invalid if it's been changed, so we nest that state within "changed". now we
-  have fewer states and events to worry about, and we can represent the parallel states in
-  our UI completely separately from one another.
-</Notes>
-
 </MainLayout>
 
 
@@ -661,13 +441,6 @@ import stateExplosionFixed from './images/state-explosion-fixed.svg';
 
 
 <CodeBlock>{expandedTrafficLightMachineCode}</CodeBlock>
-
-<Notes>
-  - Back to our traffic light, it's not *really* necessary that you understand every
-  distinction between finite state machines and statecharts. I just wanted to point it out
-  since technically speaking, for the rest of the presentation, I'll be working with
-  statecharts. And just in case you had *any* doubt...
-</Notes>
 
 </MainLayout>
 
@@ -679,20 +452,6 @@ import stateExplosionFixed from './images/state-explosion-fixed.svg';
 
 <CodeBlock fontSize="small">{trafficLightCode}</CodeBlock>
 
-<Notes>
-  - Yes, the traffic light I was showing you earlier *IS* built with this exact
-  statechart! - xstate offers a react add-on that comes with this `useMachine` hook that
-  interprets the machine and returns a tuple of the current state and a function to send
-  events to the machine - the state object has a `matches` function I can call to check
-  what the current state is, like this - the traffic light component itself is just a
-  series of boxes and circles that shows the circle of the currentColor prop you give it
-  here, so I then manage this current color with local component state that changes
-  whenever the machine's state changes - lastly you can see here the "next" button that,
-  on press, simulates the traffic light timer being up by sending the "TIME_UP" event. I
-  also have the invisible butotn that sends the "SIGNAL_FOUND" or "SIGNAL_LOST" event
-  depending on the current state.
-</Notes>
-
 </MainLayout>
 
 
@@ -703,14 +462,6 @@ import stateExplosionFixed from './images/state-explosion-fixed.svg';
 
 # Enough with the traffic lights already!
 
-<Notes>
-  - But okay, you're probably sick of me talking about this traffic light by now. No
-  application is as simple as this, so you're probably wondering how well how well
-  statecharts scale to something more realistic like Sutro and the calibration process. So
-  for the last part of this presentation, I'll actually walk you through what the process
-  was like to rebuild our calibration flow using a state machine.
-</Notes>
-
 </MainLayout>
 
 
@@ -718,30 +469,17 @@ import stateExplosionFixed from './images/state-explosion-fixed.svg';
 
 <CodeSandboxLayout id={0} />
 
-<Notes>
-  - Just like with my traffic light, remember that these buttons are just the way we're
-  going to artificially trigger events for our machine. In reality, a lot of these events
-  are actually not triggered by the user interacting with the app, but rather something
-  happening on the server based on our communication with the hardware.
-</Notes>
-
 ---
 
 <CodeSandboxLayout id={1} />
-
-<Notes>-</Notes>
 
 ---
 
 <CodeSandboxLayout id={2} />
 
-<Notes>-</Notes>
-
 ---
 
 <CodeSandboxLayout id={3} />
-
-<Notes>-</Notes>
 
 ---
 

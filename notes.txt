@@ -1,0 +1,283 @@
+Today I'm going to talk to you about something I've been experimenting with, which is modeling UI with state charts, and why you might want to consider doing so. Don't worry if you don't know what a state chart is, I'll explain!
+
+---
+
+I wanted to start this off with a little celebration of what we do here when we build things because honestly it's pretty cool. Regardless of what role you serve here on a project, you’re making something entirely new in your job every day. However you want to put it, we're pretty good at making something that was previously impossible, possible!
+
+---
+
+And sometimes, we're so good at this, we actually do it unintentionally, too! And on my project Sutro, we've gotten some really, really great user feedback commending us for these… “unintentional features”, shall we say, so I wanted to share a couple of them with you all.
+
+---
+
+So just as a bit of background in case you're unfamiliar or don’t remember, the premise of Sutro is that you get this giant device that looks kinda like a water bottle to float in your pool and take readings of various chemical properties of your water. Internally it's powered by a replaceable cartridge, so when you first set up your Sutro and whenever you need to replace the cartridge, we have to recalibrate it before we can take readings again. We walk you through this process automatically in the app, though.
+
+---
+
+With that context, let me show you this amazing recording a user shared with us of one the unintentional features we built around calibration. So in this recording,
+*click*
+the user goes to open their app, and we tell them they need to recalibrate their Sutro Monitor. Amazingly, it seems we are already working on the calibration for them, as no matter what they do, they can't seem to interact with that "Complete Calibration" button! They try force-closing and reopening, and nope, still can't interact!
+*wait for rapid motion*
+I think that motion is because they're so excited!
+*rapidly transition slide when video ends*
+Uh, just ignore that bit at the end, I'm sure that was just a glitch in the video... or something.
+
+---
+
+Okay here's another great one! Now usually, going through calibration requires the user to be present with their device in case something isn't quite right, like the lid isn't on tight, for example.
+*click*
+In this interaction, the user goes to start calibration, and we helpfully tell them that calibration is already in progress! I guess no action required on their part! Wow! That isn’t how we initially designed calibration to work, but what a seamless experience that is and definitely not a bug!
+
+---
+
+So joking aside, what's going on, here, exactly? How did we get to both of these impossible states, and what can we learn from their existence? Well, when we see a bug like this, it’s usually because one of several things happened:
+
+---
+
+Maybe the application logic changed, and the UI just got out of sync. This is probably how the first bug I showed you with the loading spinner disabling the button was introduced. Sutro’s calibration process has evolved so much over time, and whatever state condition we were relying on to tell the app we're ready to start calibration, or have already started it, clearly wasn't translating well to the UI anymore.
+
+---
+
+Another possibility is that we developers took a shortcut somewhere and now it’s come back to bite us. This is what that super helpful "Calibration in Progress" screen I showed you in the second report is about.
+
+---
+
+Here’s the code behind it. When you tap that “Complete Calibration” button, depending on whether you had an existing, abandoned calibration session or not, we show you the appropriate screen to match the step of calibration that you should be on, and the cheapest way to do so from this part of the code was with this switch statement. So of course, we added this default case here... just in case.
+
+---
+
+But these aren't the only reasons, and I'm not here just to tell you what went wrong for Sutro. These sorts of problems plague every project, all the time, and it's nobody's fault that these bugs popped up. What I want to show you today is that really, these reasons are symptoms of the same underlying problem. And what is that problem?
+
+---
+
+We need a better a model for our state. We've grown beyond piles of "isLoading" boolean flags and the layers of switch statements with default cases just like that one, and on Sutro, there's no better demonstration of this, than...
+
+---
+
+...our HW flow diagram! I've tried to zoom out in this little video as far as I can to give you sense of its scale, but it also carries over to the right of the screen and overflows into various other layers and tabs that aren't currently visible. But, this is a representation of all the logic and communication happening behind the scenes between our app, the server, and the Sutro hardware itself that we have spent countless hours revising and maintaining over our project's lifetime. So it goes without saying, but of *course* it's been a challenge to translate this into screens on a phone!
+
+---
+
+So, I'm here to suggest that that model we need for processes like Sutro’s calibration is finite state machines.
+
+---
+
+What is a finite state machine? According to Wikipedia, a finite state machine, otherwise known as a finite-state automaton, a finite automaton, or simply a state machine, is a mathematical model of computation that...
+
+---
+
+...just kidding
+I think there’s a better way that I can *show* you what they are.
+
+---
+
+That’s because, what I really want to show you today is that you already know how a finite state machine works, and that's what makes it such a good choice for modeling user interfaces. We're actually already used to thinking in state machines.
+
+---
+
+Let’s take a moment to think about a traffic light. It’s currently green. What's going to happen when I click "next"? I think you all know the answer.
+*click*
+And now?
+*click*
+Okay now for a tricky one, what comes next?
+*click secret button* HA gotcha, there’s been a malfunction with the intersection control system and the traffic light lost communication with the others, so it is now blinking red!
+…
+Okay, now that I have taken this meaningless victory, I know you know what *usually* happens.
+*turn off secret mode, click back through to red*
+And no matter how many times I iterate through this, the order will always be the same. Green, yellow, red. This traffic light can be easily modeled as a finite state machine.
+
+---
+
+The first rule of finite state machines is that you can only be in one state at any given time.
+
+---
+
+This makes sense, right? The light can't be both green and red, say, at the same time.
+
+---
+
+The second rule of finite state machines is that you have to have a finite number of states, and each of them is clearly distinguishable from the others.
+
+---
+
+In other words, I can count all the states of the traffic light and clearly describe to you what they are: green, yellow, red, and the flashing red error or hazard state, whatever you want to call that.
+
+---
+
+The third rule of finite state machines is that you transition from one state to another based on some event.
+
+---
+
+So in my contrived slideshow example, this *event* happens to be me pressing the "next" button, or the secret invisible button that cuts or restores the control signal. In real life these events would probably be like timers running out, or some "signal lost" or "signal found" event for the flashing red state.
+Knowing these three rules, maybe you can start to imagine how this would manifest in modeling actual user interfaces.
+
+---
+
+For example, you might image how this translates into acceptance conditions.
+As a driver, given the light is red (there's your current state), when 30 seconds has elapsed (there's the transition event), then, the light turns green (there's the next state).
+
+---
+
+In design, this translates precisely to the interactive prototypes you’d make. Your screens or frames are your finite states, and you enumerate all of the possible transitions between them when you connect two frames.
+
+---
+
+In code, there are libraries for building finite state machines in basically every language, but for simple examples, you might imagine implementing this with a class that takes some initial state and a schema of possible states and event transitions, and gives you a `transition` function to call. You could then tie this to the UI with a switch statement.
+
+---
+
+That’s right, a switch statement! To briefly revisit that switch statement I showed you earlier that caused the "Calibration in progress" screen bug, I want to be clear that it's not the switch statement itself that's the problem here. It's the fact that it relies on what is essentially an *implicit* state machine. Implicit because its implementation is scattered around the code base, the transitions really only understood in the developers’ heads, and the states are not well-defined. This is what makes these bugs common and challenging to track down in any app.
+
+---
+
+Since Sutro's app is built in javascript, today I'm going to show you code examples in javascript using a library called xstate. I like using it because it has pretty solid typescript support and its own visualizer tool...
+
+---
+
+...which looks like this! Here I'm inspecting a state machine I built for the super basic traffic light with only three states. The current state as well as the available events I can take from it are shown in blue, and I can send events like simulating the timer counting down by clicking them.
+*tab back to slides*
+Here's what the machine code looks like. You’ll notice it pretty closely resembles the simple state machine I suggested two slides ago. You plug this configuration object into xstate’s `Machine` function, and then I can run it wherever and however I want.
+*highlight on screen as you read*
+I've specified for this example that the initial state is 'green', and then I've defined my three states that each have a transition defined for the event 'TIME_UP', which then specifies which state it should transition to.
+To add that fourth red blinking state, I *could* just add a "SIGNAL_LOST" event transition for all three states that takes you to the blinking red state, but if in the future, we needed to add a new 'orange' state to our traffic light, we'd have to remember to add that "SIGNAL_LOST" event transition there, too, and I don't want to have to remember to do that, so I think I'm going to represent it a little bit differently:
+
+---
+
+So what I've done here is actually *nested* state. You can see our original traffic light state machine is unaltered in here, and I'm calling this whole thing the "connected" state. But now, if the traffic light loses the signal, it transitions to the "disconnected" state, where we'd show it flashing red. And once it regains the signal, it transitions back to the "connected" state and restarts on the initial state "green".
+*tab back to slides*
+In the code, this looks exactly like you might expect, with our original traffic light states nested under the "connected" state. You can also see the addition of the `SIGNAL_FOUND` and `SIGNAL_LOST` events here. I've made the initial state "connected" now to keep parity with the example I showed you, but I imagine in real life when a traffic light first powers on, it might actually take a moment to sync up to the other lights at the intersection and thus should probably start in the "disconnected" state. But we're not going for realism right now.
+
+---
+
+This new machine configuration is actually what's referred to as a statechart - it's a state machine that can have hierarchies of nested states as well as parallel states. These features make statecharts really effective at preventing what's known as "state explosion"...
+
+---
+
+...which happens as the total number of states and transitions you have grows. Here I'm showing an example state machine for a single form input field on some website where we show a different state depending on if the input is changed vs. unchanged, valid vs. invalid, or enabled vs. disabled. Represented as a regular finite state machine, it gets pretty hairy. But...
+
+---
+
+...as a statechart, we can represent enabled as a parallel state because all the combinations of it with the other properties are real, possible states, and we can change if the input is enabled without affecting if it’s also changed or valid. We can also decide that for this form input, we only consider an input valid if it's been changed, so we nest that state within "changed". This way, we have far fewer states and events to worry about, and we can show the parallel states in our UI completely separately from one another.
+
+---
+
+Back to our traffic light, it's not *really* necessary that you understand every distinction between finite state machines and statecharts. I just wanted to point it out since technically speaking, for the rest of the presentation, I'll be working with statecharts. And just in case you had *any* doubt, yes, the traffic light in this presentation *IS* built with this exact machine code! The cool thing about xstate is that this machine is actually framework agnostic, so there’s nothing React or Angular or Svelte specific about what I’m showing you here.
+
+---
+
+However, the traffic light in this presentation is built with React because I like React.
+*highlight useMachine*
+xstate offers as an add-on this React-specific `useMachine` hook that interprets the machine and returns a tuple of the current state and a function to send transition events to the machine.
+*highlight state.matches in case block*
+The state object has a `matches` function I can call to check what the current state is, like this.
+*highlight render TrafficLight*
+The traffic light component itself is just a series of boxes that shows a filled-in circle of the `currentColor` prop you give it here, so I’m managing this current color...
+*highlight useState*
+...with local component state...
+*highlight useEffect block*
+...that changes whenever the machine's state changes.
+*highlight “Next” button*
+Lastly you can see here the "next" button here that, on press, sends our "TIME_UP" transition event we defined for the machine.
+*briefly show machine and highlight “TIME_UP” event again*
+*highlight invisible button*
+I also added the cheeky invisible button here that sends the...
+*highlight toggle function*
+..."SIGNAL_FOUND" or "SIGNAL_LOST" event depending on the current state.
+
+---
+
+But okay, you're probably sick of me talking about this traffic light by now. We know most applications aren’t as simple as this, so you're probably wondering how well statecharts scale to something more realistic like Sutro’s calibration process. So for the last part of this presentation, I'll actually walk you through what the process is like to rebuild our calibration flow using a state machine! For the purposes of presenting, I’ve simplified calibration slightly, but this should still give you a pretty good idea of how this model holds up as you add complexity.
+
+---
+
+Let’s start with the helpful visual. The first thing we need to do is define all of our states. In calibration, we walk the user through several steps sequentially, so this seems like a good starting point for our states. They start on the dashboard where we tell them they need to complete calibration, then we walk through what’s called precheck1, precheck2, and prime function in order to actually perform the calibration, and assuming those all succeed, we finish and wind up back on the dashboard.
+*tab back to presentation*
+Here’s that visual in code. I’ve got four states and four events to transition between them. I’ve given each event a unique name because, unlike our traffic light, they represent very different things happening.
+My “app”, if you can call it that, is just a super minimal representation of what state we’re currently on. I have this function `getView` here which is just a giant switch statement on the current state, and when I click the button...
+*click to show “Pass Precheck1”*
+...it sends the event to simulate “passing” that step.
+*highlight onClick handler*
+Just like with my traffic light, remember that these buttons are just the way we're going to artificially trigger events for our machine. In reality, most of these calibration events aren’t triggered by the user doing anything, but rather as a response to something happening on the server based on our communication with the hardware.
+Okay so the next thing we need to add is probably pretty obvious – what happens when one of the steps of calibration fails?
+
+---
+
+So up next, I’m taking advantage of some nested state goodness to split each step of calibration into two states, the “check” state where we’re waiting for the HW to do its thing, and the “error” state if it doesn’t succeed.
+*Click in visualizer into precheck1*
+So now if precheck1 has an error, I transition to the error state and can retry from here. And if it passes, I can move to precheck2! I’ve chosen not to give unique names for the error events here, but depending on how the errors work it might make more sense for them to be unique.
+*tab back to presentation and scroll down to error button in the app*
+In the app code, I’ve added a simple error button to send this transition event now.
+But that’s actually not the only thing I’ve added. What does it look like while we’re sitting here waiting on precheck 1? During this time, the app polls the server as it waits for a status update from the HW. Statecharts actually give us a really convenient way of representing this, too, with what’s known as “activities”. Simply put, an activity is an action that occurs over time, and can be started and stopped. In our machine code, that looks like this:
+*highlight activities*
+So we say that while the machine is on the “check” state, we’re going to run a polling activity, and what is this polling activity? Well, it’s the name of a function, and for now all that function does is log to the console that it’s polling on a given step every second. In reality this is where I’d put my asynchronous API calls to get an update from the server. So I’ve gone ahead and added that to all three of the steps, as well as a way to retry, so if I open up the console, I can demo this for you:
+*open console and click through states*
+I’m also logging the event and new state here so you see those show up and then we get our polling message. And the second I hit error, the polling stops, just like we’d want. You can also notice here that no matter how many times I send an additional “error” event, nothing changes, and this is the sort of reassurance we get out of the box with state machines.
+Now, the next thing I needed to think about was how do I resume a calibration session if we already had one started and abandoned it? This nicely introduces us to two other concepts of statecharts.
+
+---
+
+*tab back from visualizer*
+While finite states are well-defined, state that represents quantitative data such a strings, numbers, or data coming from outside your app that has potentially infinite values is represented by something called extended state or context. I could choose to handle an existing calibration session in a couple different ways, but for this demo I wanted to show what it would look like if I treated it as context. So here I’ve defined a type for this machine’s context with three fields: `needsCalibration`, which is determined by the server, and `status` and `step`, which are the status and step of the last calibration session we have from the server.
+*highlight machine generation function*
+I’ve wrapped our machine in a function that takes the initial context we want the machine to start with, which you can see applied here as just another part of the machine configuration.
+*highlight context in configuration*
+Using another statecharts concept called “guarded transitions”, I can then use this context to make sure we only start calibration if we don’t already have an existing one, and otherwise redirect to the step we last left off on. That looks like this:
+*highlight guards*
+So a guard is just a function that takes the machine context and returns a boolean. For example, we define the `canCalibrate` guard as if the last session status is “COMPLETE” and we currently need calibration. Once I add these guards to my machine configuration like we did with the polling activities...
+*highlight guards in config*
+...we can use them to control where we go when we press that “Start Calibration” button over here like so:
+*highlight guards on event transitions*
+So now we can only start calibration if we can calibrate, and we can only resume if we have a session in progress on one of these steps.
+To help illustrate this, I threw together this form in our fake app which allows me to pretend to be the server and tell the app about our last calibration session. So right now the server says we don’t need calibration and our last session is finished, but if I check this box, I’ve hooked this form up to set the machine’s initial context, so we see the “Start Calibration” button becomes active again. If additionally, we as the server tell the app we have an in-progress calibration session on, say, precheck2, well first of all we only see a “Resume” button now as opposed to the “Start Calibration” one, and second of all...
+*press resume*
+...we see that as soon as I press resume and send that “RESUME” event, our guarded transitions kicked in and transitioned us directly to precheck2, from which point we could proceed through the rest of calibration as normal.
+
+---
+
+Here in the visualizer you can see these guards in action more clearly. And as before, sending a “RESUME” event when we have a calibration session in progress already does not cause the machine to transition, which I just think is dandy!
+*tab back from visualizer*
+Now I know we’ve been using buttons to send all of our events so far, but the last thing I wanted to show you is how we might automatically transition from one step to the next when a series of conditions are met. To do so, I’m going to start by expanding our machine’s extended context slightly.
+*highlight Precheck1Context type*
+So here I’ve added the context type for the 4 status checks we are actually polling the server for during Precheck1. We check that your FW is up to date, your lid is closed, your battery is charged, and your cartridge is properly installed. Only if all of these checks pass can we proceed.
+*highlight initial Precheck1Context*
+Since initially we don’t know about any of them, I’ve defined in the initial context that they all start as “waiting”.
+*highlight UpdatePrecheck1Event*
+To update the context as we’re polling, I’ve added a new event called “Update Precheck1” that actually comes with a payload. Up until now we’ve only used plain events that are basically just a unique name. If you’re familiar with Redux, this event is going to work just like a reducer action. When we receive this event, we’re going to fire off this side-effect to update the context:
+*highlight updatePrecheck1 action*
+Now we just have to tell the machine to execute this action on the “Update Precheck1” event, like so:
+*highlight UPDATE_PRECHECK1 event*
+You’ll notice the target state for this event is still just precheck1, since we’re not going anywhere until we pass.
+To demo this, I’ve added another fake server that will randomly send precheck1 status updates every couple seconds until we have all 4.
+*open console*
+*click start*
+I’ve also added a control to set the fail chance here, so if probably works out, roughly half of these checks should fail, and regardless, we should be able to observe each “Update Precheck1” event logged to the console.
+*wait*
+Yep, great, so now if I set the fail chance to something ridiculously low to simulate correcting whatever problems we were having with our HW, we should see these checks hopefully all pass and watch the state machine automatically transition.
+
+---
+
+Hopefully after all that you have a better sense of what all statecharts are capable of, and how we can manage the application state of a very complex process like Sutro’s calibration with statecharts as our model. On that note, let's talk takeaways.
+
+---
+
+Keeping UI in sync with application logic is universally hard. Sutro isn’t the first app to run into “impossible state” bugs and it certainly won’t be the last.
+
+---
+
+Having implicit state machines as the basis of your logic makes things harder to understand, harder to trace, and harder to debug.
+
+---
+
+You’re probably already thinking in state machines. It’s natural to break processes into steps, especially when it comes to software. And even if you’re not, it’s an easy muscle to train.
+
+---
+
+To review, statecharts essentially just means beefed-up finite state machines. We get some handy extras like nested states, parallel states, activities, guarded transitions, and actions, but at the core we’re still dealing with finite, discrete states and the transitions between them.
+
+---
+
+And last of all, you should totally consider using statecharts to help you model your user interfaces! Be it through generating acceptance conditions, guiding your design prototypes, or helping maintain the integrity of your codebase, I think they’re a really great tool with a lot of benefits.
+
+---
+
+Thank you! Any questions?
