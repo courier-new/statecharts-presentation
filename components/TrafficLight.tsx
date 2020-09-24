@@ -20,7 +20,7 @@ const TrafficLight: FC<{
 
   useEffect(() => {
     if (currentColor === 'hazard') {
-      setTimeout(toggleFlashing, 600);
+      setTimeout(toggleFlashing, 500);
     }
   }, [currentColor, toggleFlashing]);
 
